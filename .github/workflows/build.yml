@@ -1,32 +1,28 @@
-name: Compile Godot 3.6 APK Final
+name: Export APK with Godot CI
 
 on: [push]
 
 jobs:
-  build:
-      runs-on: ubuntu-latest
-      name: Build Godot APK
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
+  export-android:
+    runs-on: ubuntu-latest
+    name: Export Android APK
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-        - name: Download Godot 3.6 Templates
-          run: |
-            wget https://github.com/godotengine/godot/releases/download/3.6-stable/Godot_v3.6-stable_linux_headless.64.zip
-            wget https://github.com/godotengine/godot/releases/download/3.6-stable/Godot_v3.6-stable_export_templates.tpz
-            unzip Godot_v3.6-stable_linux_headless.64.zip
-            unzip Godot_v3.6-stable_export_templates.tpz
-            mkdir -p ~/.local/share/godot/templates/3.6.stable
-            mv templates/* ~/.local/share/godot/templates/3.6.stable/
+      - name: Export to Android
+        uses: firebelley/godot-export@v3.2.0
+        with:
+          godot_version: 3.6.stable
+          godot_export_templates_version: 3.6.stable
+          relative_path: ''
+          archive_output: false
+          android_export_preset: Android
+          export_debug: true
+          use_godot_3: true
 
-        - name: Generate Debug Keystore & Export APK
-          run: |
-            keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 10000
-            mkdir -p build
-            ./Godot_v3.6-stable_linux_headless.64 --path . --video-driver Dummy --export-debug "Android" ./build/EcosDeSincronia.apk
-
-        - name: Upload APK artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: EcosDeSincronia-APK
-            path: build/EcosDeSincronia.apk
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcosDeSincronia-APK
+          path: /home/runner/work/EcosDeSincronia/EcosDeSincronia/build/Android/*.apk
