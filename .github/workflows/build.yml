@@ -22,9 +22,8 @@ jobs:
         - name: Generate Debug Keystore & Export APK
           run: |
             keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 10000
-            mkdir -p ~/.local/share/godot/
             mkdir -p build
-            ./Godot_v3.6-stable_linux_headless.64 --export-debug "Android" ./build/EcosDeSincronia.apk
+            ./Godot_v3.6-stable_linux_headless.64 --path . --export-debug "Android" ./build/EcosDeSincronia.apk
 
         - name: Upload APK artifact
           uses: actions/upload-artifact@v4
