@@ -23,7 +23,7 @@ jobs:
           run: |
             keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 10000
             mkdir -p build
-            ./Godot_v3.6-stable_linux_headless.64 --path . --export-debug "Android" ./build/EcosDeSincronia.apk
+            ./Godot_v3.6-stable_linux_headless.64 --path . --video-driver Dummy --export-debug "Android" ./build/EcosDeSincronia.apk
 
         - name: Upload APK artifact
           uses: actions/upload-artifact@v4
