@@ -1,28 +1,43 @@
-name: Export APK with Godot CI
+name: Compile Godot 3.6 APK Final
 
 on: [push]
 
 jobs:
-  export-android:
-    runs-on: ubuntu-latest
-    name: Export Android APK
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  build:
+      runs-on: ubuntu-latest
+      name: Build Godot APK
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Export to Android
-        uses: firebelley/godot-export@v3
-        with:
-          godot_version: 3.6.stable
-          godot_export_templates_version: 3.6.stable
-          relative_path: ''
-          archive_output: false
-          android_export_preset: Android
-          export_debug: true
-          use_godot_3: true
+        - name: Download Godot 3.6 Templates
+          run: |
+            wget https://github.com/godotengine/godot/releases/download/3.6-stable/Godot_v3.6-stable_linux_headless.64.zip
+            wget https://github.com/godotengine/godot/releases/download/3.6-stable/Godot_v3.6-stable_export_templates.tpz
+            unzip Godot_v3.6-stable_linux_headless.64.zip
+            unzip Godot_v3.6-stable_export_templates.tpz
+            mkdir -p ~/.local/share/godot/templates/3.6.stable
+            mv templates/* ~/.local/share/godot/templates/3.6.stable/
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: EcosDeSincronia-APK
-          path: /home/runner/work/EcosDeSincronia/EcosDeSincronia/build/Android/*.apk
+        - name: Generate Keystore & Force Editor Settings
+          run: |
+            keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 10000
+            mkdir -p ~/.config/godot
+            echo '[editor]' > ~/.config/godot/editor_settings-3.tres
+            echo 'export/android/debug_keystore = "'$(pwd)'/debug.keystore"' >> ~/.config/godot/editor_settings-3.tres
+            echo 'export/android/debug_keystore_user = "androiddebugkey"' >> ~/.config/godot/editor_settings-3.tres
+            echo 'export/android/debug_keystore_pass = "android"' >> ~/.config/godot/editor_settings-3.tres
+
+        - name: Import Assets First (Fix Missing Scripts Error)
+          run: ./Godot_v3.6-stable_linux_headless.64 --editor --quit || true
+
+        - name: Export APK
+          run: |
+            mkdir -p build
+            ./Godot_v3.6-stable_linux_headless.64 --export-debug "Android" ./build/EcosDeSincronia.apk
+
+        - name: Upload APK artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: EcosDeSincronia-APK
+            path: build/EcosDeSincronia.apk
