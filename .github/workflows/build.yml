@@ -19,14 +19,22 @@ jobs:
             mkdir -p ~/.local/share/godot/templates/3.6.stable
             mv templates/* ~/.local/share/godot/templates/3.6.stable/
 
-        - name: Generate Keystore & Force Editor Settings
+        - name: Setup Android SDK Paths & Keystore
           run: |
+            # 1. Generar la llave
             keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 10000
+            
+            # 2. Forzar las rutas de Android SDK, Jarsigner y Keystore en Godot
             mkdir -p ~/.config/godot
-            echo '[editor]' > ~/.config/godot/editor_settings-3.tres
-            echo 'export/android/debug_keystore = "'$(pwd)'/debug.keystore"' >> ~/.config/godot/editor_settings-3.tres
-            echo 'export/android/debug_keystore_user = "androiddebugkey"' >> ~/.config/godot/editor_settings-3.tres
-            echo 'export/android/debug_keystore_pass = "android"' >> ~/.config/godot/editor_settings-3.tres
+            cat <<EOF > ~/.config/godot/editor_settings-3.tres
+            [gd_resource type="EditorSettings" format=2]
+            [resource]
+            export/android/adb = "/usr/local/lib/android/sdk/platform-tools/adb"
+            export/android/jarsigner = "/usr/bin/jarsigner"
+            export/android/debug_keystore = "${GITHUB_WORKSPACE}/debug.keystore"
+            export/android/debug_keystore_user = "androiddebugkey"
+            export/android/debug_keystore_pass = "android"
+            EOF
 
         - name: Import Assets First (Fix Missing Scripts Error)
           run: ./Godot_v3.6-stable_linux_headless.64 --editor --quit || true
