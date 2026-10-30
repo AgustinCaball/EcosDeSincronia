@@ -1,11 +1,11 @@
-name: Compile Godot 3.6 PCK
+name: Compile Godot 3.6 APK Final
 
 on: [push]
 
 jobs:
   build:
       runs-on: ubuntu-latest
-      name: Build Godot PCK
+      name: Build Godot APK
       steps:
         - name: Checkout code
           uses: actions/checkout@v3
@@ -19,13 +19,15 @@ jobs:
             mkdir -p ~/.local/share/godot/templates/3.6.stable
             mv templates/* ~/.local/share/godot/templates/3.6.stable/
 
-        - name: Export Project PCK
+        - name: Generate Debug Keystore & Export APK
           run: |
+            keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 10000
+            mkdir -p ~/.local/share/godot/
             mkdir -p build
-            ./Godot_v3.6-stable_linux_headless.64 --export-pack "Android" ./build/EcosDeSincronia.pck
+            ./Godot_v3.6-stable_linux_headless.64 --export-debug "Android" ./build/EcosDeSincronia.apk
 
-        - name: Upload PCK artifact
+        - name: Upload APK artifact
           uses: actions/upload-artifact@v4
           with:
-            name: EcosDeSincronia-PCK
-            path: build/EcosDeSincronia.pck
+            name: EcosDeSincronia-APK
+            path: build/EcosDeSincronia.apk
