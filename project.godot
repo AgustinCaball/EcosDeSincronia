@@ -1,0 +1,60 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "BattleMechanics",
+"language": "GDScript",
+"path": "res://scripts/utils/BattleMechanics.gd"
+}, {
+"base": "Reference",
+"class": "GeoUtils",
+"language": "GDScript",
+"path": "res://scripts/utils/GeoUtils.gd"
+} ]
+_global_script_class_icons={
+"BattleMechanics": "",
+"GeoUtils": ""
+}
+
+[application]
+
+config/name="Ecos de Sincronia"
+config/description="RPG de exploracion geolocalizada para Android inspirado en Pokemon GO y la quinta generacion (Pokemon Blanco y Negro)."
+run/main_scene="res://scenes/map/MapScene.tscn"
+config/icon="res://icon.png"
+
+[autoload]
+
+DatabaseLoader="*res://scripts/utils/DatabaseLoader.gd"
+PlayerData="*res://scripts/autoloads/PlayerData.gd"
+GameManager="*res://scripts/autoloads/GameManager.gd"
+GPSManager="*res://scripts/autoloads/GPSManager.gd"
+WeatherTimeManager="*res://scripts/autoloads/WeatherTimeManager.gd"
+StoryManager="*res://scripts/autoloads/StoryManager.gd"
+
+[display]
+
+window/size/width=720
+window/size/height=1280
+window/size/test_width=360
+window/size/test_height=640
+window/handheld/orientation="portrait"
+window/stretch/mode="2d"
+window/stretch/aspect="keep_width"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[rendering]
+
+quality/driver/driver_name="GLES2"
+environment/default_clear_color=Color( 0.0823529, 0.101961, 0.141176, 1 )
